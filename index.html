@@ -54,14 +54,16 @@
 <!-- القائمة الجانبية -->
 <div class="sidebar" id="sidebar">
     <button class="close-btn" onclick="closeSidebar()">&times;</button>
+   
     <h2>الموقع</h2>
-    <a href="index.html" class="active"><i class="fas fa-home"></i> الصفحة الرئيسية</a>
+    <a href="index.html"><i class="fas fa-home"></i> الصفحة الرئيسية</a>
     <a href="contact.html"><i class="fas fa-envelope"></i> تواصل معنا</a>
     <a href="your store with us.html"><i class="fas fa-shop"></i> منتجك معنا</a>
     <a href="signup/about.html"><i><img src="imgs/abo2.png" class="imggus"></i> من نحن </a>
 
     <a href="login.html"><i class="fas fa-user"></i> تسجيل الدخول </a>
-    <a href="signup/logout.htm"><i><img src="imgs/arrows.svg" class="imggus" ></i> تسجيل الخروج </a>
+    <a href="signup/logout.htm"><i><img src="imgs/arrows.svg" class="imggus"></i>تسجيل الخروج</a>
+   
 </div>
 
     <!-- ===== Hero ===== -->
@@ -99,7 +101,7 @@
       <div class="grid" id="products-grid"></div>
 
     </section>
-
+<div id="toast" class="toast">تمت الإضافة إلى السلة ✅</div>
     <!-- ===== Footer ===== -->
     <footer>
       <div class="foot-grid container" style="gap:12px;align-items:center;flex-wrap:wrap;">
@@ -130,21 +132,26 @@
       localStorage.setItem(CART_KEY, JSON.stringify(c));
     }
 
-    function addToCartFromIndex(id, title, price, image){
-      let cart = loadCart();
+function addToCartFromIndex(id, title, price, image){
+  let cart = loadCart();
 
-      let item = cart.find(x => x.id === id);
-      if(item){
-        item.qty++;
-      } else {
-        cart.push({
-          id, title, price, image, qty: 1
-        });
-      }
-     
-      saveCart(cart);
-      
-    }
+  let item = cart.find(x => x.id === id);
+  if(item){
+    item.qty++;
+  } else {
+    cart.push({
+      id, title, price, image, qty: 1
+    });
+  }
+
+  saveCart(cart);
+
+  updateCartBadge();   // ✅ تحديث رقم السلة
+  showToast("تمت إضافة المنتج إلى السلة ✅"); // ✅ رسالة تفاعلية
+}
+
+
+
 
   
     /* ===============================
@@ -202,30 +209,32 @@
       });
     }
 
-    document.addEventListener('DOMContentLoaded', renderProducts);
+    // document.addEventListener('DOMContentLoaded', renderProducts);
+   document.addEventListener('DOMContentLoaded', () => {
+  renderProducts();
+  updateCartBadge(); // ✅ تحديث الرقم عند فتح الصفحة
+});
 
+
+
+
+    function showToast(msg){
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2000);
+}
+
+
+function updateCartBadge(){
+  const cart = loadCart();
+  const count = cart.reduce((sum, item) => sum + item.qty, 0);
+  document.querySelector(".badge").textContent = count;
+}
   </script>
-<script>function addToCart(btn){
-      const badge = document.querySelector('.badge');
-      let count = Number(badge.textContent || 0);
-      count++;
-      badge.textContent = count;
-      // تأثير بصري سريع
-      btn.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-6px)' },
-       { transform: 'translateY(0)' }], { duration: 300 });
-      // رسالة سريعة
-      const msg = document.createElement('div');
-      msg.textContent = 'تمت الإضافة إلى السلة ✓';
-      msg.style.position = 'fixed';
-      msg.style.bottom = '18px';
-      msg.style.left = '18px';
-      msg.style.padding = '10px 14px';
-      msg.style.borderRadius = '10px';
-      msg.style.background = 'linear-gradient(90deg,var(--primary),var(--secondary))';
-      msg.style.color = '#fff';
-      msg.style.boxShadow = '0 10px 30px rgba(0,0,0,0.08)';
-      document.body.appendChild(msg);
-      setTimeout(()=> msg.remove(), 1500);
-    }</script>
+
 </body>
 </html>
